@@ -62,14 +62,17 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
             if (!this.playerContinueInBackground.get(playerId)) {
                 MediaPlayer player = entry.getValue();
                 player.pause();
+                try {
+                    WritableMap info = getInfo(player);
 
-                WritableMap info = getInfo(player);
+                    WritableMap data = new WritableNativeMap();
+                    data.putString("message", "Playback paused due to onHostPause");
+                    data.putMap("info", info);
 
-                WritableMap data = new WritableNativeMap();
-                data.putString("message", "Playback paused due to onHostPause");
-                data.putMap("info", info);
-
-                emitEvent(playerId, "pause", data);
+                    emitEvent(playerId, "pause", data);
+                } catch (IllegalStateException e) {
+                    // ignore this exception
+                }
             }
         }
     }
@@ -211,7 +214,6 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
 
     private WritableMap getInfo(MediaPlayer player) {
         WritableMap info = Arguments.createMap();
-
         info.putDouble("duration", player.getDuration());
         info.putDouble("position", player.getCurrentPosition());
         info.putDouble("audioSessionId", player.getAudioSessionId());
