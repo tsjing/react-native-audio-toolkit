@@ -66,8 +66,8 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
 
             if (!this.playerContinueInBackground.get(playerId)) {
                 MediaPlayer player = entry.getValue();
-                player.pause();
                 try {
+                    player.pause();
                     WritableMap info = getInfo(player);
 
                     WritableMap data = new WritableNativeMap();
