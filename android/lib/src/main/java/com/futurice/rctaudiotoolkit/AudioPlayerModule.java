@@ -61,12 +61,12 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
 
     @Override
     public void onHostPause() {
-        for (Map.Entry<Integer, MediaPlayer> entry : this.playerPool.entrySet()) {
-            Integer playerId = entry.getKey();
+        try {
+            for (Map.Entry<Integer, MediaPlayer> entry : this.playerPool.entrySet()) {
+                Integer playerId = entry.getKey();
 
-            if (!this.playerContinueInBackground.get(playerId)) {
-                MediaPlayer player = entry.getValue();
-                try {
+                if (!this.playerContinueInBackground.get(playerId)) {
+                    MediaPlayer player = entry.getValue();
                     player.pause();
                     WritableMap info = getInfo(player);
 
@@ -75,10 +75,10 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
                     data.putMap("info", info);
 
                     emitEvent(playerId, "pause", data);
-                } catch (IllegalStateException e) {
-                    // ignore this exception
                 }
             }
+        } catch (IllegalStateException|ConcurrentModificationException e) {
+            // ignore this exception
         }
     }
 
